@@ -42,7 +42,7 @@ namespace UserControl.Data
                       .HasColumnType("VARCHAR(50)")
                       .IsRequired(false);
 
-                // 🔁 Auto-relacionamento corrigido (sem OnUpdate)
+                // 🔁 Auto-relacionamento
                 entity.HasOne(u => u.Manager)
                       .WithMany()
                       .HasForeignKey(u => u.ManagerEmail)
