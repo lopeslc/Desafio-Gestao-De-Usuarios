@@ -10,26 +10,40 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-  <div class="container">
-    <h2>Novo usuário</h2>
+  <div class="card w-400">
+    <h2 style="margin-top:0;">Novo usuário</h2>
     <form (ngSubmit)="create()">
-      <label>Email</label>
-      <input [(ngModel)]="email" name="email" required type="email" />
-      <label>Nome</label>
-      <input [(ngModel)]="nome" name="nome" required />
-      <label>Senha</label>
-      <input [(ngModel)]="senha" name="senha" required type="password" />
-      <label>Admin?</label>
-      <input type="checkbox" [(ngModel)]="isAdmin" name="isAdmin" />
-      <label>Manager Email (opcional)</label>
-      <input [(ngModel)]="managerEmail" name="managerEmail" />
-      <button type="submit">Criar</button>
-      <button type="button" (click)="back()">Voltar</button>
+      <div>
+        <label>Email</label>
+        <input [(ngModel)]="email" name="email" required type="email" />
+      </div>
+      <div>
+        <label>Nome</label>
+        <input [(ngModel)]="nome" name="nome" required />
+      </div>
+      <div>
+        <label>Senha</label>
+        <input [(ngModel)]="senha" name="senha" required type="password" />
+      </div>
+      <div>
+        <label>Admin?</label>
+        <input type="checkbox" [(ngModel)]="isAdmin" name="isAdmin" />
+      </div>
+      <div>
+        <label>Manager Email (opcional)</label>
+        <input [(ngModel)]="managerEmail" name="managerEmail" />
+      </div>
+
+      <div class="actions">
+        <button type="submit">Criar</button>
+        <button class="ghost" type="button" (click)="back()">Voltar</button>
+      </div>
     </form>
-    <p *ngIf="err" class="err">{{err}}</p>
+
+    <p *ngIf="err" class="err mt-24">{{err}}</p>
   </div>
   `,
-  styles:[`.container{max-width:500px;margin:40px auto;display:flex;flex-direction:column;gap:8px} input{padding:8px} .err{color:#c00}`]
+  styles: []
 })
 export class UserFormComponent {
   email=''; nome=''; senha=''; isAdmin=false; managerEmail: string | null = null; err='';

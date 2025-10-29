@@ -9,30 +9,57 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-  <div class="container">
-    <h2>Login</h2>
-    <form (ngSubmit)="onSubmit()">
-      <label>Email</label>
-      <input [(ngModel)]="email" name="email" type="email" required />
+  <div class="center" style="min-height: calc(100dvh - 70px);">
+    <div class="card w-400">
+      <h2 style="margin:0 0 10px 0;">Login</h2>
+      <p style="margin:0 0 18px 0;color:var(--muted)">Entre com suas credenciais</p>
 
-      <label>Senha</label>
-      <input [(ngModel)]="senha" name="senha" type="password" required />
+      <form (ngSubmit)="onSubmit()">
+        <div>
+          <label>Email</label>
+          <input [(ngModel)]="email" name="email" type="email" required (input)="err=''" />
+        </div>
+        <div>
+          <label>Senha</label>
+          <input [(ngModel)]="senha" name="senha" type="password" required (input)="err=''" />
+        </div>
 
-      <button type="submit">Entrar</button>
-    </form>
-    <p *ngIf="err" class="err">{{err}}</p>
+        <div class="actions">
+          <button type="submit" [disabled]="loading">
+            {{ loading ? 'Entrando...' : 'Entrar' }}
+          </button>
+        </div>
+      </form>
+
+      <p *ngIf="err" class="err mt-24">{{err}}</p>
+    </div>
   </div>
   `,
-  styles:[`.container{max-width:360px;margin:40px auto;display:flex;flex-direction:column;gap:8px} input{padding:8px} .err{color:#c00}`]
+  styles: []
 })
 export class LoginComponent {
-  email=''; senha=''; err='';
+  email = '';
+  senha = '';
+  err = '';
+  loading = false;
+
   constructor(private auth: AuthService, private router: Router) {}
-  onSubmit(){
-    this.err='';
+
+  onSubmit() {
+    if (this.loading) return;       // evita duplo submit
+    this.err = '';
+    this.loading = true;
+
     this.auth.login(this.email, this.senha).subscribe({
-      next: r => { this.auth.setToken(r.token); this.router.navigate(['/me']); },
-      error: () => this.err = 'Credenciais inválidas'
+      next: r => {
+        this.auth.setToken(r.token);
+        this.router.navigate(['/me']);
+      },
+      error: () => {
+        this.err = 'Credenciais inválidas';
+        this.loading = false;
+      },
+      complete: () => (this.loading = false)
     });
   }
 }
