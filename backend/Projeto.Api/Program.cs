@@ -13,14 +13,35 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Projeto Simples API", Version = "v1" });
-    var jwtScheme = new OpenApiSecurityScheme
+
+    // Definição do esquema Bearer (cole só o token, sem "Bearer")
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name = "Authorization", Type = SecuritySchemeType.Http, Scheme = "bearer",
-        BearerFormat = "JWT", In = ParameterLocation.Header, Description = "Insira o token JWT"
-    };
-    c.AddSecurityDefinition("Bearer", jwtScheme);
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement { { jwtScheme, Array.Empty<string>() } });
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insira apenas o token JWT (sem o prefixo 'Bearer')"
+    });
+
+    // Requisito global de segurança referenciando a definição acima
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
+
 
 // Injeta infra com connection string
 var connStr = builder.Configuration.GetConnectionString("Sql")!;

@@ -1,0 +1,16 @@
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\bin\Debug\net8.0\Projeto.Infra.deps.json
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\bin\Debug\net8.0\Projeto.Infra.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\bin\Debug\net8.0\Projeto.Infra.pdb
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\bin\Debug\net8.0\Projeto.Core.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\bin\Debug\net8.0\Projeto.Core.pdb
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.csproj.AssemblyReference.cache
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.GeneratedMSBuildEditorConfig.editorconfig
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.AssemblyInfoInputs.cache
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.AssemblyInfo.cs
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.csproj.CoreCompileInputs.cache
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.sourcelink.json
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto..11D22185.Up2Date
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\refint\Projeto.Infra.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\Projeto.Infra.pdb
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Infra\obj\Debug\net8.0\ref\Projeto.Infra.dll

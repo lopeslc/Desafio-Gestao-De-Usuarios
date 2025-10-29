@@ -1,0 +1,12 @@
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\bin\Debug\net8.0\Projeto.Core.deps.json
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\bin\Debug\net8.0\Projeto.Core.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\bin\Debug\net8.0\Projeto.Core.pdb
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.AssemblyInfoInputs.cache
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.AssemblyInfo.cs
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.csproj.CoreCompileInputs.cache
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.sourcelink.json
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\refint\Projeto.Core.dll
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\Projeto.Core.pdb
+C:\luan\SistemaGDU\Desafio-Gestao-De-Usuarios\backend\Projeto.Core\obj\Debug\net8.0\ref\Projeto.Core.dll
