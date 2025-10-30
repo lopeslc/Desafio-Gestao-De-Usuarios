@@ -14,7 +14,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Projeto Simples API", Version = "v1" });
 
-    // Definição do esquema Bearer (cole só o token, sem "Bearer")
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -25,23 +24,17 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Insira apenas o token JWT (sem o prefixo 'Bearer')"
     });
 
-    // Requisito global de segurança referenciando a definição acima
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             Array.Empty<string>()
         }
     });
 });
-
 
 // Injeta infra com connection string
 var connStr = builder.Configuration.GetConnectionString("Sql")!;
@@ -55,7 +48,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         o.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true, ValidateAudience = true, ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
@@ -64,7 +59,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // CORS liberado p/ dev
-builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
+    .AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
 
@@ -76,7 +72,9 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ==========================
 // ROTAS
+// ==========================
 
 // Login
 app.MapPost("/auth/login", async (IAuthService auth, LoginDto dto) =>
@@ -87,6 +85,29 @@ app.MapPost("/auth/login", async (IAuthService auth, LoginDto dto) =>
 .WithName("Login")
 .Produces(200)
 .Produces(401);
+
+// ----- Esqueci a senha (ANÔNIMAS) -----
+
+// Solicita reset: sempre 202 (não revela se email existe). Em DEV, token aparece no console.
+app.MapPost("/auth/forgot", async (IAuthService auth, ForgotDto dto) =>
+{
+    await auth.CreatePasswordResetAsync(dto.Email);
+    return Results.Accepted();
+})
+.AllowAnonymous()
+.WithName("ForgotPassword")
+.Produces(202);
+
+// Redefine senha via token (GUID) gerado acima.
+app.MapPost("/auth/reset", async (IAuthService auth, ResetDto dto) =>
+{
+    var ok = await auth.ResetPasswordAsync(dto.Token, dto.NovaSenha);
+    return ok ? Results.NoContent() : Results.BadRequest("Token inválido ou expirado.");
+})
+.AllowAnonymous()
+.WithName("ResetPassword")
+.Produces(204)
+.Produces(400);
 
 // Registrar (apenas Admin)
 app.MapPost("/auth/register", async (IAuthService auth, UserCreateDto dto, ClaimsPrincipal user) =>
