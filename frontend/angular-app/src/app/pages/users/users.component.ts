@@ -1,98 +1,121 @@
-import { Component, OnInit, inject, effect, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 
-type User = { email: string; nome: string; isAdmin: boolean; managerEmail?: string | null };
+type User = { email: string; nome: string; isAdmin: boolean; managerEmail: string | null };
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-      <h2 style="margin:0;">Usuários</h2>
-      <button (click)="goNew()">Novo usuário</button>
+    <div class="row between center-v">
+      <h2 style="margin:0">Usuários</h2>
+      <a routerLink="/users/new" class="secondary" *ngIf="auth.isAdmin()">Novo usuário</a>
     </div>
 
-    <p *ngIf="loading" style="color:var(--muted)" class="mt-24">Carregando...</p>
-    <p *ngIf="err" class="err mt-24">{{err}}</p>
+    <div class="mt-8" *ngIf="!auth.isAdmin()">
+      <p class="err">Acesso restrito a administradores.</p>
+    </div>
 
-    <div class="table-wrap mt-24" *ngIf="!loading && users.length; else vazio">
-      <table>
+    <div class="mt-8" *ngIf="auth.isAdmin()">
+      <p *ngIf="loading" style="color:var(--muted)">Carregando...</p>
+      <p *ngIf="err" class="err">{{err}}</p>
+
+      <table *ngIf="!loading && users.length" class="table">
         <thead>
           <tr>
-            <th>Email</th><th>Nome</th><th>Admin</th><th>Gerente</th><th style="width:220px">Ações</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Papel</th>
+            <th>Manager</th>
+            <th style="width:180px"></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let u of users">
-            <td>{{u.email}}</td>
-            <td>{{u.nome}}</td>
-            <td>{{u.isAdmin ? 'Sim' : 'Não'}}</td>
-            <td>{{u.managerEmail || '-'}}</td>
-            <td>
-              <div class="actions">
-                <button class="ghost" (click)="toggleAdmin(u)">{{ u.isAdmin ? 'Remover admin' : 'Promover a admin' }}</button>
-                <button class="danger" (click)="remove(u.email)">Remover</button>
-              </div>
+            <td>{{ u.nome }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.isAdmin ? 'Admin' : 'User' }}</td>
+            <td>{{ u.managerEmail || '—' }}</td>
+            <td class="row" style="gap:8px">
+              <a [routerLink]="['/users/new']" [queryParams]="{ email: u.email }" class="secondary">Editar</a>
+              <button class="ghost" (click)="remove(u.email)">Remover</button>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <ng-template #vazio>
-      <p *ngIf="!loading && !err" style="color:var(--muted);margin-top:18px;">Nenhum usuário cadastrado.</p>
-    </ng-template>
+      <div *ngIf="!loading && !users.length && !err" class="empty">
+        Nenhum usuário encontrado.
+      </div>
+
+      <div class="mt-8">
+        <button class="ghost" (click)="reload()">Recarregar</button>
+      </div>
+    </div>
   </div>
-  `
+  `,
+  styles: [`
+    .row{display:flex;gap:12px}
+    .between{justify-content:space-between}
+    .center-v{align-items:center}
+    .table{width:100%; border-collapse:collapse; margin-top:12px}
+    .table th, .table td{border-bottom:1px solid #eee; padding:10px}
+    .empty{color:var(--muted); margin-top:12px}
+  `]
 })
 export class UsersComponent implements OnInit {
   private http = inject(HttpClient);
-  private router = inject(Router);
-  private auth = inject(AuthService);
+  auth = inject(AuthService);
   private platformId = inject(PLATFORM_ID);
-  isBrowser = isPlatformBrowser(this.platformId);
+  private isBrowser = isPlatformBrowser(this.platformId);
 
   users: User[] = [];
   loading = false;
   err = '';
 
-  ngOnInit() {
-    // Reage ao estado admin; carrega só no browser
-    effect(() => {
-      if (!this.isBrowser) return;
-      const can = this.auth.isAdminSig();
-      if (can) this.load();
-      else { this.users = []; this.loading = false; }
-    });
-
-    if (this.isBrowser && this.auth.isAdminSig()) this.load();
+  ngOnInit(): void {
+    if (this.isBrowser && this.auth.isAdmin()) {
+      this.load();
+    }
   }
 
-  private load() {
-    this.err = '';
-    this.loading = true;
+  reload(){ this.load(); }
+
+  private load(){
+    this.err=''; this.loading = true;
+
     this.http.get<User[]>(`${environment.apiUrl}/users`).subscribe({
-      next: (list)=> { this.users = list; this.loading = false; },
-      error: (e)=> { this.err = e?.error || 'Erro ao carregar usuários.'; this.loading = false; }
+      next: list => {
+        // ajuda a depurar no console
+        console.log('GET /users OK:', list);
+        this.users = list ?? [];
+        this.loading = false;
+      },
+      error: (e) => {
+        this.loading = false;
+        // Mostra a causa real para você ver na tela
+        const status = e?.status;
+        const body = typeof e?.error === 'string' ? e.error : (e?.error?.message ?? '');
+        this.err = status ? `Erro ${status} ao carregar usuários. ${body}` : 'Não foi possível carregar usuários.';
+        console.error('GET /users ERRO:', e);
+      }
     });
-  }
-
-  goNew(){ this.router.navigate(['/users/new']); }
-
-  toggleAdmin(u: User){
-    const body = { nome: u.nome, isAdmin: !u.isAdmin, managerEmail: u.managerEmail ?? null };
-    this.http.put(`${environment.apiUrl}/users/${encodeURIComponent(u.email)}`, body)
-      .subscribe({ next: ()=> this.load() });
   }
 
   remove(email: string){
-    this.http.delete(`${environment.apiUrl}/users/${encodeURIComponent(email)}`)
-      .subscribe({ next: ()=> this.load() });
+    if (!confirm('Remover este usuário?')) return;
+    this.http.delete(`${environment.apiUrl}/users/${encodeURIComponent(email)}`).subscribe({
+      next: () => { this.users = this.users.filter(u => u.email !== email); },
+      error: (e) => {
+        console.error('DELETE /users erro:', e);
+        alert('Não foi possível remover.');
+      }
+    });
   }
 }

@@ -22,6 +22,21 @@ public class AuthService : IAuthService
         _connStr = _cfg.GetConnectionString("Sql")!;
     }
 
+    public async Task<bool> ChangePasswordAsync(string email, string currentSenha, string novaSenha)
+    {
+        if (_repo is not UserRepo concrete) return false;
+        var authRow = await concrete.GetAuthRow(email);
+        if (authRow is null) return false;
+
+        var ok = BCrypt.Net.BCrypt.Verify(currentSenha, authRow.Value.SenhaHash);
+        if (!ok) return false;
+
+        var newHash = BCrypt.Net.BCrypt.HashPassword(novaSenha);
+        await _repo.UpdatePasswordHashAsync(email, newHash);
+        return true;
+    }
+
+
     public async Task<string?> LoginAsync(string email, string senha)
     {
         if (_repo is not UserRepo concrete) return null;

@@ -28,6 +28,23 @@ public class UserRepo : IUserRepo
         await cmd.ExecuteNonQueryAsync();
     }
 
+    public async Task UpdatePasswordHashAsync(string email, string newHash)
+    {
+        using var con = new SqlConnection(_connStr);
+        await con.OpenAsync();
+
+        var cmd = new SqlCommand(@"
+            UPDATE dbo.Users
+            SET SenhaHash = @hash
+            WHERE Email = @e", con);
+
+        cmd.Parameters.AddWithValue("@hash", newHash);
+        cmd.Parameters.AddWithValue("@e", email);
+
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+
     public async Task<User?> GetByEmailAsync(string email)
     {
         await using var con = new SqlConnection(_connStr);

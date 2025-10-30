@@ -8,12 +8,15 @@ using Projeto.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ==========================
 // Swagger + esquema Bearer
+// ==========================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Projeto Simples API", Version = "v1" });
 
+    // Definição do esquema Bearer (cole apenas o token)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -24,6 +27,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Insira apenas o token JWT (sem o prefixo 'Bearer')"
     });
 
+    // Requisito global de segurança
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -36,12 +40,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Injeta infra com connection string
+// ==========================
+// Injeção de dependências
+// ==========================
 var connStr = builder.Configuration.GetConnectionString("Sql")!;
 builder.Services.AddSingleton<IUserRepo>(_ => new UserRepo(connStr));
 builder.Services.AddSingleton<IAuthService, AuthService>();
 
+// ==========================
 // JWT
+// ==========================
 var keyBytes = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
@@ -56,9 +64,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
         };
     });
+
 builder.Services.AddAuthorization();
 
-// CORS liberado p/ dev
+// ==========================
+// CORS
+// ==========================
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
     .AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
@@ -86,9 +97,7 @@ app.MapPost("/auth/login", async (IAuthService auth, LoginDto dto) =>
 .Produces(200)
 .Produces(401);
 
-// ----- Esqueci a senha (ANÔNIMAS) -----
-
-// Solicita reset: sempre 202 (não revela se email existe). Em DEV, token aparece no console.
+// Esqueci minha senha (Anônimo)
 app.MapPost("/auth/forgot", async (IAuthService auth, ForgotDto dto) =>
 {
     await auth.CreatePasswordResetAsync(dto.Email);
@@ -98,7 +107,7 @@ app.MapPost("/auth/forgot", async (IAuthService auth, ForgotDto dto) =>
 .WithName("ForgotPassword")
 .Produces(202);
 
-// Redefine senha via token (GUID) gerado acima.
+// Resetar senha (Anônimo)
 app.MapPost("/auth/reset", async (IAuthService auth, ResetDto dto) =>
 {
     var ok = await auth.ResetPasswordAsync(dto.Token, dto.NovaSenha);
@@ -109,7 +118,7 @@ app.MapPost("/auth/reset", async (IAuthService auth, ResetDto dto) =>
 .Produces(204)
 .Produces(400);
 
-// Registrar (apenas Admin)
+// Registrar (Apenas Admin)
 app.MapPost("/auth/register", async (IAuthService auth, UserCreateDto dto, ClaimsPrincipal user) =>
 {
     if (!user.IsInRole("Admin")) return Results.Forbid();
@@ -169,6 +178,21 @@ app.MapGet("/me", async (IAuthService auth, ClaimsPrincipal user) =>
 })
 .RequireAuthorization()
 .WithName("Me");
+
+// Trocar senha (Usuário autenticado)
+app.MapPost("/auth/change-password", async (IAuthService auth, ClaimsPrincipal user, ChangePasswordDto dto) =>
+{
+    var email = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (email is null) return Results.Unauthorized();
+
+    var ok = await auth.ChangePasswordAsync(email, dto.CurrentSenha, dto.NovaSenha);
+    return ok ? Results.NoContent() : Results.BadRequest("Senha atual incorreta.");
+})
+.RequireAuthorization()
+.WithName("ChangePassword")
+.Produces(204)
+.Produces(400)
+.Produces(401);
 
 // Seed opcional (execute 1x e remova depois)
 app.MapPost("/dev/seed-admin", async (IAuthService auth) =>
