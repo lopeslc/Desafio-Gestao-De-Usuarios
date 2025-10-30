@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-reset',
@@ -13,7 +13,9 @@ import { Router, RouterLink } from '@angular/router';
   <div class="center" style="min-height: calc(100dvh - 70px);">
     <div class="card w-400">
       <h2 style="margin-top:0">Redefinir senha</h2>
-      <p style="color:var(--muted)">Cole aqui o token que recebeu (em DEV, está no console do servidor) e escolha a nova senha.</p>
+      <p style="color:var(--muted)">
+        Cole o token (GUID) do console do servidor .NET e escolha a nova senha.
+      </p>
 
       <form (ngSubmit)="submit()">
         <label>Token (GUID)</label>
@@ -24,7 +26,7 @@ import { Router, RouterLink } from '@angular/router';
 
         <div class="actions">
           <button type="submit" [disabled]="loading">{{ loading ? 'Salvando...' : 'Redefinir' }}</button>
-          <a routerLink="/login" class="ghost" style="padding:10px 14px; border-radius:10px; text-decoration:none;">Voltar</a>
+          <a routerLink="/login" class="ghost" style="padding:10px 14px;border-radius:10px;text-decoration:none;">Voltar</a>
         </div>
       </form>
 
@@ -41,9 +43,9 @@ export class ResetComponent {
   ok = false;
   err = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
-  submit(){
+  submit() {
     if (this.loading) return;
     this.err=''; this.ok=false; this.loading=true;
 
