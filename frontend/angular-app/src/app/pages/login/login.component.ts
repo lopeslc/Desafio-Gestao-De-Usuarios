@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
+ template: `
   <div class="center" style="min-height: calc(100dvh - 70px);">
     <div class="card w-400">
       <h2 style="margin:0 0 10px 0;">Login</h2>
@@ -28,13 +28,16 @@ import { AuthService } from '../../services/auth.service';
           <button type="submit" [disabled]="loading">
             {{ loading ? 'Entrando...' : 'Entrar' }}
           </button>
+          <a routerLink="/forgot" class="ghost" style="padding:10px 14px; border-radius:10px; text-decoration:none;">
+            Esqueci minha senha
+          </a>
         </div>
       </form>
 
       <p *ngIf="err" class="err mt-24">{{err}}</p>
     </div>
   </div>
-  `,
+`,
   styles: []
 })
 export class LoginComponent {
